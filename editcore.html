@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EditCore | Professional Masterclass</title>
+    <title>EditCore - Creative Career Masterclass</title>
     
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500;700&family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@400&family=Manrope:wght@500;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500;600&family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@400&family=Manrope:wght@500;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -27,15 +28,27 @@
     </script>
     <style>
         html { scroll-behavior: smooth; }
-        body { background-color: #05020a; color: white; overflow-x: hidden; margin: 0; }
+        body { background-color: #05020a; color: white; overflow-x: hidden; }
         
+        /* Cinematic Noise Overlay */
         .noise {
             position: fixed; inset: 0; width: 100%; height: 100%;
             background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.2; pointer-events: none; z-index: 90; filter: contrast(180%) brightness(120%);
+            opacity: 0.22; pointer-events: none; z-index: 90; filter: contrast(180%) brightness(110%);
         }
 
-        /* The Animated Glowing Border */
+        /* Continuous Motion Carousel */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            display: flex;
+            width: max-content;
+            animation: marquee 35s linear infinite;
+        }
+
+        /* Thick Animated Glowing Border */
         .glowing-container {
             position: relative; padding: 6px; border-radius: 32px;
             overflow: hidden; box-shadow: 0 0 80px rgba(123, 57, 252, 0.6);
@@ -43,27 +56,15 @@
         .glowing-container::before {
             content: ''; position: absolute; width: 250%; height: 250%;
             background: conic-gradient(transparent, #7b39fc, #fff, #7b39fc, transparent 40%);
-            top: -75%; left: -75%; animation: borderRotate 2.5s linear infinite;
+            top: -75%; left: -75%; animation: borderRotate 2s linear infinite;
         }
         @keyframes borderRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .glowing-inner { position: relative; z-index: 10; background: #080512; border-radius: 26px; }
-
-        /* Draggable Carousel Setup */
-        .carousel-track {
-            display: flex; gap: 40px; cursor: grab; padding: 20px 0;
-            transition: transform 0.1s ease-out; user-select: none;
-        }
-        .carousel-track:active { cursor: grabbing; }
-        .video-card {
-            flex: 0 0 auto; width: 650px; height: 380px;
-            border-radius: 24px; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: #000;
-        }
-        .video-card video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
         
-        /* Utility */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .glowing-inner { 
+            position: relative; z-index: 10; background: #080512; border-radius: 26px; 
+        }
+        
+        .section-view { min-height: 100vh; display: flex; align-items: center; justify-content: center; width: 100%; }
     </style>
 </head>
 <body>
@@ -75,37 +76,17 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect } = React;
 
-        const App = () => {
+        const EditCoreApp = () => {
             const [selected, setSelected] = useState([]);
             const [blur, setBlur] = useState(0);
-            
-            // Drag and Drop Logic
-            const sliderRef = useRef(null);
-            const isDown = useRef(false);
-            const startX = useRef(0);
-            const scrollLeft = useRef(0);
 
             useEffect(() => {
-                const handleScroll = () => setBlur(Math.min(window.scrollY / 20, 30));
+                const handleScroll = () => setBlur(Math.min(window.scrollY / 20, 25));
                 window.addEventListener("scroll", handleScroll);
                 return () => window.removeEventListener("scroll", handleScroll);
             }, []);
-
-            const handleDragStart = (e) => {
-                isDown.current = true;
-                startX.current = e.pageX - sliderRef.current.offsetLeft;
-                scrollLeft.current = sliderRef.current.scrollLeft;
-            };
-            const handleDragEnd = () => { isDown.current = false; };
-            const handleDragMove = (e) => {
-                if (!isDown.current) return;
-                e.preventDefault();
-                const x = e.pageX - sliderRef.current.offsetLeft;
-                const walk = (x - startX.current) * 2;
-                sliderRef.current.scrollLeft = scrollLeft.current - walk;
-            };
 
             const toggle = (val) => {
                 setSelected(prev => prev.includes(val) ? prev.filter(i => i !== val) : [...prev, val]);
@@ -116,15 +97,8 @@
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             };
 
-            const videoSources = [
-                "https://cdn.pixabay.com/video/2021/04/12/70796-537482343_large.mp4",
-                "https://cdn.pixabay.com/video/2023/10/21/185934-877209639_large.mp4",
-                "https://cdn.pixabay.com/video/2020/11/17/55648-477546022_large.mp4",
-                "https://cdn.pixabay.com/video/2021/09/14/88561-605891392_large.mp4"
-            ];
-
             return (
-                <div className="relative w-full">
+                <div className="relative">
                     {/* VIDEO BACKGROUND */}
                     <div className="fixed inset-0 z-0" style={{ filter: `blur(${blur}px)` }}>
                         <video autoPlay loop muted playsInline className="w-full h-full object-cover brightness-[0.3]">
@@ -134,38 +108,45 @@
 
                     {/* NAVBAR */}
                     <nav className="fixed top-0 z-[100] w-full flex items-center justify-between px-6 lg:px-[120px] py-6 bg-black/60 backdrop-blur-2xl border-b border-white/5">
-                        <div className="font-manrope font-extrabold tracking-tighter text-2xl cursor-pointer italic" onClick={() => window.scrollTo(0,0)}>EDITCORE.</div>
-                        <div className="hidden lg:flex gap-12 font-manrope font-bold text-[10px] tracking-[0.4em] uppercase text-white/40">
-                            <button onClick={() => jumpTo('courses')} className="hover:text-primary transition-all">Courses</button>
-                            <button onClick={() => jumpTo('gallery')} className="hover:text-primary transition-all">Gallery</button>
-                            <button onClick={() => jumpTo('career')} className="hover:text-primary transition-all">Enroll</button>
+                        <div className="font-manrope font-black tracking-tighter text-2xl cursor-pointer italic" onClick={() => window.scrollTo(0,0)}>
+                            EDITCORE.
                         </div>
-                        <button onClick={() => jumpTo('career')} className="bg-primary px-8 py-3 rounded-full font-manrope font-bold text-[10px] uppercase tracking-widest hover:shadow-[0_0_30px_#7b39fc] transition-all">Enroll Now</button>
+                        <div className="hidden lg:flex gap-12 font-manrope font-bold text-[10px] tracking-[0.4em] uppercase text-white/40">
+                            <button onClick={() => jumpTo('courses')} className="hover:text-primary transition-all">Syllabus</button>
+                            <button onClick={() => jumpTo('gallery')} className="hover:text-primary transition-all">Gallery</button>
+                            <button onClick={() => jumpTo('career')} className="hover:text-primary transition-all">Join</button>
+                        </div>
+                        <button onClick={() => jumpTo('career')} className="bg-primary px-8 py-3 rounded-full font-manrope font-bold text-[10px] uppercase tracking-widest hover:shadow-[0_0_30px_#7b39fc] transition-all">
+                            Apply Now
+                        </button>
                     </nav>
 
                     {/* HERO */}
-                    <section className="min-h-screen flex items-center justify-center relative z-10 px-6">
+                    <section className="section-view relative z-10 px-6">
                         <div className="text-center">
                             <div className="inline-block bg-white/5 border border-white/10 px-6 py-2 rounded-full mb-10 backdrop-blur-md">
-                                <span className="font-manrope text-[9px] font-bold tracking-[0.5em] text-white/60 uppercase">The Masterclass Protocol // 2026</span>
+                                <span className="font-manrope text-[9px] font-bold tracking-[0.5em] text-white/60 uppercase">The Editing Masterclass 2026</span>
                             </div>
-                            <h1 className="font-instrument text-[55px] md:text-[110px] leading-[0.9] max-w-[1100px] mb-10">Master the art <br/> <span className="italic">of the</span> Edit.</h1>
+                            <h1 className="font-instrument text-[55px] md:text-[110px] leading-[0.9] max-w-[1100px] mb-10">
+                                Launch your <span className="italic">Creative</span> career today.
+                            </h1>
+                            <p className="text-white/60 font-inter text-xl md:text-2xl max-w-2xl mx-auto mb-14 leading-relaxed">High-performance training for After Effects, Premiere Pro, and FL Studio.</p>
                             <div className="flex flex-col sm:flex-row justify-center gap-6">
-                                <button onClick={() => jumpTo('courses')} className="bg-primary px-12 py-6 rounded-2xl font-manrope font-bold text-xs tracking-widest uppercase hover:scale-105 transition-all">Browse Syllabus</button>
+                                <button onClick={() => jumpTo('courses')} className="bg-primary px-12 py-6 rounded-2xl font-manrope font-bold text-xs tracking-widest uppercase hover:scale-105 transition-all">View Courses</button>
                                 <button onClick={() => jumpTo('gallery')} className="bg-white/5 border border-white/20 px-12 py-6 rounded-2xl font-manrope font-bold text-xs tracking-widest uppercase hover:bg-white/10 transition-all">Watch Demos</button>
                             </div>
                         </div>
                     </section>
 
                     {/* COURSES */}
-                    <section id="courses" className="min-h-screen flex items-center justify-center relative z-10 px-6 lg:px-[120px] py-32">
+                    <section id="courses" className="section-view relative z-10 px-6 lg:px-[120px] py-32">
                         <div className="w-full">
                             <h2 className="font-instrument text-7xl md:text-9xl text-center mb-28 italic">The Toolkit</h2>
                             <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                                 {[
-                                    { t: "After Effects", d: "High-end motion design, VFX compositing, and expressions.", id: "AE" },
-                                    { t: "Premiere Pro", d: "Cinematic storytelling, sound design, and color grading.", id: "PR" },
-                                    { t: "FL Studio", d: "Music production for creators, mixing, and mastering.", id: "FL" }
+                                    { t: "After Effects", d: "VFX, Motion GFX, and advanced 3D compositing.", id: "AE" },
+                                    { t: "Premiere Pro", d: "Narrative editing, color science, and workflow.", id: "PR" },
+                                    { t: "FL Studio", d: "Soundtrack scoring and hybrid music production.", id: "FL" }
                                 ].map((c, i) => (
                                     <div key={i} className="bg-white/5 p-12 rounded-[40px] border border-white/10 hover:border-primary/50 transition-all">
                                         <div className="text-4xl font-black text-primary mb-8">{c.id}</div>
@@ -177,51 +158,45 @@
                         </div>
                     </section>
 
-                    {/* DRAGGABLE GALLERY (CLEAN) */}
-                    <section id="gallery" className="py-48 z-10 relative">
-                        <h2 className="font-instrument text-7xl md:text-9xl text-center mb-24 italic">Visual Power</h2>
-                        <div 
-                            ref={sliderRef}
-                            className="overflow-x-scroll no-scrollbar px-10"
-                            onMouseDown={handleDragStart}
-                            onMouseLeave={handleDragEnd}
-                            onMouseUp={handleDragEnd}
-                            onMouseMove={handleDragMove}
-                        >
-                            <div className="carousel-track">
-                                {videoSources.concat(videoSources).map((url, i) => (
-                                    <div key={i} className="video-card shadow-2xl">
-                                        <video autoPlay loop muted playsInline>
-                                            <source src={url} type="video/mp4" />
-                                        </video>
-                                    </div>
-                                ))}
-                            </div>
+                    {/* GALLERY (REAL GIFS) */}
+                    <section id="gallery" className="py-48 overflow-hidden z-10 bg-black/30 border-y border-white/5 relative">
+                        <h2 className="font-instrument text-7xl md:text-9xl text-center mb-24 italic">Motion GFX</h2>
+                        <div className="animate-marquee gap-10">
+                            {[
+                                "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJocXJ5dmRscXJpYXRreHh3dHBxcHFwcHFwcHFwcHFwcHFwcHFwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKMGpxVfFvTdf4k/giphy.gif",
+                                "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJocXJ5dmRscXJpYXRreHh3dHBxcHFwcHFwcHFwcHFwcHFwcHFwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l41lTjJptGZ2s7a5W/giphy.gif",
+                                "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJocXJ5dmRscXJpYXRreHh3dHBxcHFwcHFwcHFwcHFwcHFwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26uf404O4J8oOQ6Nq/giphy.gif",
+                                "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJocXJ5dmRscXJpYXRreHh3dHBxcHFwcHFwcHFwcHFwcHFwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKVUn7iM8FMEU24/giphy.gif"
+                            ].map((url, i) => (
+                                <div key={i} className="w-[600px] h-[350px] bg-zinc-900 rounded-[32px] overflow-hidden border-2 border-white/10 group shadow-2xl flex-shrink-0">
+                                    <img src={url} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700 grayscale group-hover:grayscale-0" />
+                                </div>
+                            ))}
                         </div>
                     </section>
 
                     {/* CONTACT (CAREER START) */}
-                    <section id="career" className="min-h-screen flex items-center justify-center relative z-10 px-6 lg:px-[120px] bg-black">
+                    <section id="career" className="section-view relative z-10 px-6 lg:px-[120px] bg-black">
                         <div className="max-w-4xl w-full glowing-container">
-                            <div className="glowing-inner p-10 md:p-20 text-center">
-                                <h2 className="font-instrument text-5xl md:text-7xl mb-6 italic">Start your career now!</h2>
-                                <p className="text-white/40 font-inter text-xl mb-12 max-w-lg mx-auto">Select your specializations and our team will reach out with the syllabus.</p>
+                            <div className="glowing-inner p-10 md:p-16">
+                                <h2 className="font-instrument text-5xl md:text-7xl text-center mb-6 italic">Start your career now!</h2>
+                                <p className="text-center text-white/40 font-inter mb-12">Submit your application to join the next cohort.</p>
                                 
-                                <form className="space-y-10" onSubmit={e => e.preventDefault()}>
-                                    <div className="grid md:grid-cols-2 gap-8">
-                                        <input type="text" placeholder="NAME" className="bg-white/5 border border-white/10 p-5 rounded-xl outline-none font-manrope text-[11px] tracking-widest uppercase focus:border-primary transition-all text-center" />
-                                        <input type="email" placeholder="EMAIL" className="bg-white/5 border border-white/10 p-5 rounded-xl outline-none font-manrope text-[11px] tracking-widest uppercase focus:border-primary transition-all text-center" />
+                                <form className="space-y-8" onSubmit={e => e.preventDefault()}>
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <input type="text" placeholder="NAME" className="bg-white/5 border border-white/10 p-5 rounded-xl outline-none font-manrope text-[11px] tracking-widest uppercase focus:border-primary transition-all" />
+                                        <input type="email" placeholder="EMAIL" className="bg-white/5 border border-white/10 p-5 rounded-xl outline-none font-manrope text-[11px] tracking-widest uppercase focus:border-primary transition-all" />
                                     </div>
 
                                     <div className="space-y-6">
-                                        <p className="text-center text-[10px] font-bold text-white/30 tracking-[0.4em] uppercase">Select Specializations</p>
+                                        <p className="text-center text-[10px] font-bold text-white/20 tracking-widest uppercase">Select Courses</p>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             {["After Effects", "Premiere Pro", "FL Studio"].map(course => (
                                                 <button 
                                                     key={course}
                                                     type="button"
                                                     onClick={() => toggle(course)}
-                                                    className={`py-4 rounded-xl border-2 font-manrope font-bold text-[10px] tracking-widest uppercase transition-all ${selected.includes(course) ? 'border-primary bg-primary/20 text-white shadow-[0_0_20px_#7b39fc]' : 'border-white/10 text-white/30'}`}
+                                                    className={`py-4 rounded-xl border-2 font-manrope font-bold text-[10px] tracking-widest uppercase transition-all ${selected.includes(course) ? 'border-primary bg-primary/20 shadow-[0_0_20px_#7b39fc]' : 'border-white/10 text-white/30'}`}
                                                 >
                                                     {course}
                                                 </button>
@@ -229,7 +204,7 @@
                                         </div>
                                     </div>
 
-                                    <button className="w-full bg-primary py-7 rounded-2xl font-manrope font-bold text-sm tracking-[0.5em] uppercase hover:shadow-[0_0_50px_#7b39fc] transition-all">
+                                    <button className="w-full bg-primary py-6 rounded-2xl font-manrope font-bold text-sm tracking-[0.4em] uppercase hover:shadow-[0_0_50px_#7b39fc] transition-all">
                                         Request Enrollment
                                     </button>
                                 </form>
@@ -237,10 +212,13 @@
                         </div>
                     </section>
 
+                    {/* FOOTER */}
                     <footer className="relative py-24 border-t border-white/5 bg-[#050505] z-10 px-10">
-                        <div className="flex justify-between items-center text-[10px] font-manrope font-bold text-white/20 tracking-widest uppercase">
-                            <div className="italic">EDITCORE.</div>
-                            <span>© 2026 // BEYOND THE FRAME</span>
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-10">
+                            <div className="font-manrope font-black text-xl italic opacity-20 tracking-tighter">EDITCORE.</div>
+                            <div className="flex gap-12 text-[10px] font-manrope font-bold text-white/20 tracking-widest uppercase">
+                                <span>© 2026 EDITCORE DIGITAL</span>
+                            </div>
                         </div>
                     </footer>
                 </div>
@@ -248,7 +226,7 @@
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(<EditCoreApp />);
     </script>
 </body>
 </html>
