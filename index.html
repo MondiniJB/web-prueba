@@ -1,27 +1,21 @@
-<!-- VERSION 2.0 - SHINY NOISE EDITION - MAY 2026 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datacore - Glowing Vintage</title>
+    <title>EditCore - Masterclass for Creators</title>
     
-    <!-- Google Fonts -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500&family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@400&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500;600&family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@400;600&family=Manrope:wght@500;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#7b39fc',
-                        secondary: '#2b2344',
-                    },
+                    colors: { primary: '#7b39fc', dark: '#2b2344' },
                     fontFamily: {
                         manrope: ['Manrope', 'sans-serif'],
                         cabin: ['Cabin', 'sans-serif'],
@@ -32,67 +26,44 @@
             }
         }
     </script>
-    
     <style>
         html { scroll-behavior: smooth; }
-        body { margin: 0; padding: 0; background-color: #05020a; color: white; overflow-x: hidden; }
+        body { background-color: #05020a; color: white; overflow-x: hidden; }
         
-        /* --- DYNAMIC NOISE OVERLAY (OLD FILM LOOK) --- */
         .noise-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; inset: 0; width: 100%; height: 100%;
             background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.18;
-            pointer-events: none;
-            z-index: 90;
-            filter: contrast(170%) brightness(100%);
+            opacity: 0.18; pointer-events: none; z-index: 90; filter: contrast(170%);
         }
 
-        /* --- SHINY GLOW --- */
-        .glow-text {
-            text-shadow: 0 0 15px rgba(123, 57, 252, 0.6), 0 0 30px rgba(123, 57, 252, 0.3);
+        /* --- CAROUSEL ANIMATION --- */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            display: flex;
+            width: 200%;
+            animation: marquee 30s linear infinite;
         }
 
-        .shiny-card {
-            background: rgba(20, 10, 35, 0.85);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(164, 132, 215, 0.4);
-            box-shadow: 0 0 40px rgba(123, 57, 252, 0.15);
-        }
-
-        /* --- THE ANIMATED GLOWING BORDER --- */
+        /* --- GLOWING CONTACT BORDER --- */
         .glowing-container {
-            position: relative;
-            padding: 4px; /* Thickness */
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(123, 57, 252, 0.7);
+            position: relative; padding: 4px; border-radius: 28px;
+            overflow: hidden; box-shadow: 0 0 50px rgba(123, 57, 252, 0.7);
         }
-
         .glowing-container::before {
-            content: '';
-            position: absolute;
-            width: 250%; height: 250%;
-            /* High contrast beam: White and Purple */
+            content: ''; position: absolute; width: 250%; height: 250%;
             background: conic-gradient(transparent, #7b39fc, #fff, #7b39fc, transparent 40%);
-            top: -75%; left: -75%;
-            animation: borderRotate 2s linear infinite;
+            top: -75%; left: -75%; animation: borderRotate 2.5s linear infinite;
         }
-
-        @keyframes borderRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .glowing-inner {
-            position: relative;
-            z-index: 10;
-            background: #080512;
-            border-radius: 24px;
-        }
-
-        .footer-glow {
-            box-shadow: 0 -30px 100px -20px rgba(123, 57, 252, 0.4);
+        @keyframes borderRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .glowing-inner { position: relative; z-index: 10; background: #0a0812; border-radius: 24px; }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
@@ -100,7 +71,6 @@
     <div id="root"></div>
     <div class="noise-overlay"></div>
 
-    <!-- React & Babel -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -108,121 +78,161 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        const LandingPage = () => {
+        const App = () => {
+            const [selectedCourses, setSelectedCourses] = useState([]);
             const [blur, setBlur] = useState(0);
 
             useEffect(() => {
-                const handleScroll = () => setBlur(Math.min(window.scrollY / 15, 25));
+                const handleScroll = () => setBlur(Math.min(window.scrollY / 20, 25));
                 window.addEventListener("scroll", handleScroll);
                 return () => window.removeEventListener("scroll", handleScroll);
             }, []);
 
+            const toggleCourse = (course) => {
+                setSelectedCourses(prev => 
+                    prev.includes(course) ? prev.filter(c => c !== course) : [...prev, course]
+                );
+            };
+
             const scrollTo = (id) => {
-                const el = document.getElementById(id);
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
             };
 
             return (
                 <div className="relative w-full">
                     {/* VIDEO BACKGROUND */}
-                    <div className="fixed inset-0 z-0" style={{ filter: `blur(${blur}px) contrast(1.1)` }}>
-                        <video autoPlay loop muted playsInline className="w-full h-full object-cover brightness-[0.45]">
+                    <div className="fixed inset-0 z-0" style={{ filter: `blur(${blur}px)` }}>
+                        <video autoPlay loop muted playsInline className="w-full h-full object-cover brightness-[0.4]">
                             <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260210_031346_d87182fb-b0af-4273-84d1-c6fd17d6bf0f.mp4" type="video/mp4" />
                         </video>
                     </div>
 
-                    {/* NAV */}
-                    <nav className="fixed top-0 z-[100] w-full flex items-center justify-between px-6 lg:px-[120px] py-6 bg-black/50 backdrop-blur-md border-b border-white/5">
-                        <div className="cursor-pointer" onClick={() => scrollTo('home')}>
-                            <svg width="28" height="28" viewBox="0 0 32 32" fill="white" className="drop-shadow-[0_0_8px_#fff]"><path d="M1.04356 6.35771L13.6437 0.666504V12.0489L1.04356 6.35771Z"/><path d="M18.3563 0.666504L30.9564 6.35771L18.3563 12.0489V0.666504Z"/><path d="M1.04356 25.6423L13.6437 31.3335V19.9511L1.04356 25.6423Z"/><path d="M18.3563 31.3335L30.9564 25.6423L18.3563 19.9511V31.3335Z"/></svg>
+                    {/* NAVBAR */}
+                    <nav className="fixed top-0 z-[100] w-full flex items-center justify-between px-6 lg:px-[120px] py-6 bg-black/40 backdrop-blur-md">
+                        <div className="font-manrope font-bold tracking-tighter text-2xl flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo(0,0)}>
+                            <div className="w-8 h-8 bg-primary rounded flex items-center justify-center text-sm italic">E</div>
+                            EDITCORE
                         </div>
-                        <div className="hidden lg:flex gap-12 font-manrope font-bold text-[11px] tracking-[0.3em] uppercase">
-                            {["Home", "Services", "Reviews", "Contact Us"].map(l => (
-                                <button key={l} onClick={() => scrollTo(l.toLowerCase().replace(' ', ''))} className="hover:text-primary hover:drop-shadow-[0_0_5px_#7b39fc] transition-all">{l}</button>
-                            ))}
+                        <div className="hidden lg:flex gap-10 font-manrope font-bold text-[12px] tracking-widest uppercase text-white/60">
+                            <button onClick={() => scrollTo('courses')} className="hover:text-primary transition-colors">Courses</button>
+                            <button onClick={() => scrollTo('demo')} className="hover:text-primary transition-colors">Demonstration</button>
+                            <button onClick={() => scrollTo('contact')} className="hover:text-primary transition-colors">Apply</button>
                         </div>
-                        <button onClick={() => scrollTo('contactus')} className="bg-primary px-8 py-2.5 rounded-sm font-manrope font-bold text-[10px] tracking-widest uppercase shadow-[0_0_20px_rgba(123,57,252,0.5)]">Get Started</button>
+                        <button onClick={() => scrollTo('contact')} className="bg-primary px-6 py-2 rounded-lg font-manrope font-bold text-xs uppercase tracking-widest hover:shadow-[0_0_20px_#7b39fc] transition-all">
+                            Enroll Now
+                        </button>
                     </nav>
 
-                    {/* SECTIONS */}
-                    <main className="relative z-10">
-                        {/* HERO */}
-                        <section id="home" className="min-h-screen flex flex-col items-center justify-center text-center px-6">
-                            <div className="border border-white/20 bg-white/5 backdrop-blur-sm px-4 py-1 mb-8">
-                                <span className="font-manrope text-[9px] font-bold tracking-[0.5em]">SYSTEM VERSION 3.2</span>
-                            </div>
-                            <h1 className="font-instrument text-[55px] md:text-[100px] leading-tight glow-text max-w-5xl mb-10">
-                                Book your perfect stay instantly <br/> <span className="italic opacity-80">and</span> hassle-free
-                            </h1>
-                            <p className="text-white/60 font-inter text-lg max-w-xl mb-12">Digital luxury for the elite traveler. Fast, secure, and exclusive.</p>
-                            <button onClick={() => scrollTo('contactus')} className="bg-white text-black px-12 py-5 font-manrope font-bold text-[11px] tracking-widest uppercase hover:bg-primary hover:text-white transition-all shadow-xl">Enter Datacore</button>
-                        </section>
+                    {/* HERO */}
+                    <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 z-10">
+                        <div className="bg-primary/20 border border-primary/40 px-4 py-1.5 rounded-full mb-8 backdrop-blur-md">
+                            <span className="font-manrope text-[10px] font-bold tracking-[0.3em] text-primary">MASTERCLASS // 2026</span>
+                        </div>
+                        <h1 className="font-instrument text-[55px] md:text-[100px] leading-[1.05] max-w-5xl mb-8">
+                            Master the art of <span className="italic">Visual</span> and Sound Editing
+                        </h1>
+                        <p className="text-white/70 font-inter text-lg md:text-xl max-w-2xl mb-12">Become a pro in After Effects, Premiere Pro, and FL Studio. From zero to industry-ready portfolio.</p>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <button onClick={() => scrollTo('courses')} className="bg-primary px-10 py-5 rounded-xl font-cabin font-bold text-sm tracking-widest uppercase transition-all hover:brightness-110">View Courses</button>
+                            <button onClick={() => scrollTo('demo')} className="bg-white/10 backdrop-blur-md px-10 py-5 rounded-xl border border-white/20 font-cabin font-bold text-sm tracking-widest uppercase transition-all hover:bg-white/20">Watch Demo</button>
+                        </div>
+                    </section>
 
-                        {/* SERVICES */}
-                        <section id="services" className="py-40 px-6 lg:px-[120px]">
-                            <h2 className="font-instrument text-6xl md:text-8xl text-center glow-text mb-24">Services</h2>
-                            <div className="grid lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
-                                {[
-                                    { t: "Concierge", d: "Global 24/7 support for elite requests.", img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" },
-                                    { t: "Exclusive", d: "Off-market properties worldwide.", img: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=800&q=80" },
-                                    { t: "Instant", d: "One-click booking for our members.", img: "https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?auto=format&fit=crop&w=800&q=80" }
-                                ].map((s, i) => (
-                                    <div key={i} className="shiny-card group transition-all duration-500 overflow-hidden rounded-xl">
-                                        <div className="h-60 grayscale group-hover:grayscale-0 transition-all duration-700">
-                                            <img src={s.img} className="w-full h-full object-cover opacity-50 group-hover:opacity-100" />
-                                        </div>
-                                        <div className="p-10">
-                                            <h3 className="font-instrument text-3xl italic mb-4">{s.t}</h3>
-                                            <p className="text-white/50 font-inter text-sm leading-relaxed">{s.d}</p>
+                    {/* COURSES SECTION */}
+                    <section id="courses" className="relative py-32 px-6 lg:px-[120px] z-10">
+                        <h2 className="font-instrument text-6xl md:text-8xl text-center mb-24">Courses</h2>
+                        <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                            {[
+                                { t: "After Effects", d: "Professional motion graphics, 3D compositing, and visual effects masterclass.", icon: "Ae" },
+                                { t: "Premiere Pro", d: "Narrative storytelling, advanced color grading, and workflow optimization.", icon: "Pr" },
+                                { t: "FL Studio", d: "Music production, sound design, and mixing/mastering for creators.", icon: "Fl" }
+                            ].map((c, i) => (
+                                <div key={i} className="glass-card p-10 rounded-[32px] group hover:border-primary/50 transition-all duration-500">
+                                    <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-2xl font-bold text-primary mb-8 group-hover:scale-110 transition-transform">
+                                        {c.icon}
+                                    </div>
+                                    <h3 className="font-instrument text-4xl mb-4 italic">{c.t}</h3>
+                                    <p className="text-white/60 font-inter leading-relaxed text-lg mb-8">{c.d}</p>
+                                    <ul className="space-y-3 text-sm font-manrope text-white/40 mb-10">
+                                        <li>• 40+ Hours of Content</li>
+                                        <li>• Project Assets Included</li>
+                                        <li>• Discord Community Access</li>
+                                    </ul>
+                                    <button onClick={() => scrollTo('contact')} className="text-primary font-bold text-xs uppercase tracking-widest group-hover:underline">Learn more</button>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* DEMONSTRATION CAROUSEL */}
+                    <section id="demo" className="relative py-32 overflow-hidden z-10">
+                        <h2 className="font-instrument text-6xl md:text-8xl text-center mb-20 italic">Motion Gallery</h2>
+                        <div className="animate-marquee gap-8">
+                            {[1, 2, 3, 4, 1, 2, 3, 4].map((n, i) => (
+                                <div key={i} className="w-[400px] h-[250px] bg-white/5 rounded-2xl flex-shrink-0 overflow-hidden border border-white/10 group">
+                                    <img 
+                                        src={`https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80&sig=${i}`} 
+                                        className="w-full h-full object-cover opacity-50 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 grayscale group-hover:grayscale-0" 
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="bg-primary/80 backdrop-blur px-4 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase">Motion GFX Preview</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* CONTACT FORM (GLOWING BOX) */}
+                    <section id="contact" className="relative py-32 px-6 lg:px-[120px] flex justify-center z-10">
+                        <div className="max-w-4xl w-full glowing-container">
+                            <div className="glowing-inner p-10 md:p-20">
+                                <h2 className="font-instrument text-5xl md:text-7xl text-center mb-4 italic">Start your career now!</h2>
+                                <p className="text-center text-white/50 font-inter text-lg mb-12">Submit your details to receive the course syllabus and pricing.</p>
+                                
+                                <form className="space-y-8" onSubmit={e => e.preventDefault()}>
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        <input type="text" placeholder="YOUR NAME" className="bg-white/5 border border-white/10 p-5 rounded-xl focus:border-primary outline-none transition-all font-manrope text-[11px] tracking-widest uppercase" />
+                                        <input type="email" placeholder="E-MAIL ADDRESS" className="bg-white/5 border border-white/10 p-5 rounded-xl focus:border-primary outline-none transition-all font-manrope text-[11px] tracking-widest uppercase" />
+                                    </div>
+
+                                    {/* Multiple Choice Course Selector */}
+                                    <div className="space-y-4">
+                                        <label className="text-[10px] font-bold tracking-[.3em] text-white/40 uppercase block mb-4">Choose your paths:</label>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            {["After Effects", "Premiere Pro", "FL Studio"].map(course => (
+                                                <button 
+                                                    key={course}
+                                                    type="button"
+                                                    onClick={() => toggleCourse(course)}
+                                                    className={`p-4 rounded-xl border transition-all text-xs font-bold tracking-widest uppercase ${selectedCourses.includes(course) ? 'border-primary bg-primary/20 text-white shadow-[0_0_15px_#7b39fc]' : 'border-white/10 text-white/40 hover:border-white/30'}`}
+                                                >
+                                                    {course}
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        </section>
 
-                        {/* REVIEWS (TRANSPARENT) */}
-                        <section id="reviews" className="py-40 px-6 lg:px-[120px]">
-                            <h2 className="font-instrument text-6xl md:text-8xl text-center glow-text italic mb-24">Testimonials</h2>
-                            <div className="grid md:grid-cols-2 gap-20 max-w-4xl mx-auto">
-                                <div className="border-l border-primary pl-10">
-                                    <p className="text-2xl font-instrument italic mb-6">"The Swiss Alps villa was stunning. Datacore makes high-end travel feel effortless."</p>
-                                    <span className="font-manrope font-bold text-[10px] tracking-widest text-primary uppercase">Marcus V.</span>
-                                </div>
-                                <div className="border-l border-white/20 pl-10">
-                                    <p className="text-2xl font-instrument italic mb-6">"A level of service that doesn't exist elsewhere. Simply the best."</p>
-                                    <span className="font-manrope font-bold text-[10px] tracking-widest text-white/40 uppercase">Sarah K.</span>
-                                </div>
+                                    <button className="w-full bg-primary py-6 rounded-xl font-manrope font-bold text-sm tracking-[0.4em] uppercase hover:shadow-[0_0_40px_#7b39fc] transition-all">
+                                        Request Enrollment
+                                    </button>
+                                </form>
                             </div>
-                        </section>
-
-                        {/* CONTACT US (Sized to viewport) */}
-                        <section id="contactus" className="min-h-screen flex items-center justify-center px-6 py-20">
-                            <div className="max-w-4xl w-full glowing-container">
-                                <div className="glowing-inner p-10 md:p-16">
-                                    <h2 className="font-instrument text-5xl md:text-6xl text-center glow-text italic mb-10">Inquire</h2>
-                                    <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={e => e.preventDefault()}>
-                                        <input type="text" placeholder="Name" className="bg-white/5 border border-white/10 p-4 rounded focus:border-primary outline-none transition-all" />
-                                        <input type="email" placeholder="Email" className="bg-white/5 border border-white/10 p-4 rounded focus:border-primary outline-none transition-all" />
-                                        <textarea placeholder="Message" className="md:col-span-2 bg-white/5 border border-white/10 p-4 rounded h-32 focus:border-primary outline-none transition-all"></textarea>
-                                        <button className="md:col-span-2 bg-primary py-4 font-manrope font-bold text-[12px] tracking-[0.3em] uppercase hover:shadow-[0_0_30px_#7b39fc] transition-all">Submit</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </section>
-                    </main>
+                        </div>
+                    </section>
 
                     {/* FOOTER */}
-                    <footer className="relative z-10 footer-glow bg-black py-20 px-6 border-t border-white/10">
-                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-                            <div className="flex items-center gap-4">
-                                <div className="w-8 h-8 bg-white text-black flex items-center justify-center font-bold">D</div>
-                                <span className="font-manrope font-bold tracking-[0.5em] text-xs">DATACORE</span>
+                    <footer className="relative py-20 border-t border-white/10 bg-black/40 z-10 px-6 lg:px-[120px]">
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-8 text-white/20 text-[10px] font-manrope font-bold tracking-widest uppercase">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 border border-white/10 flex items-center justify-center">E</div>
+                                EDITCORE DIGITAL
                             </div>
-                            <div className="flex gap-10 text-[10px] font-manrope font-bold text-white/30 tracking-widest uppercase">
-                                <a href="#" className="hover:text-primary">Privacy</a>
-                                <a href="#" className="hover:text-primary">Legal</a>
+                            <div className="flex gap-10">
+                                <a href="#" className="hover:text-primary transition-colors">Privacy</a>
+                                <a href="#" className="hover:text-primary transition-colors">Legal Terms</a>
+                                <a href="#" className="hover:text-primary transition-colors">Refunds</a>
                             </div>
-                            <p className="text-white/20 text-[9px] tracking-[0.2em] font-inter uppercase">© 2026 Datacore Digital. All rights reserved.</p>
+                            <div>© 2026 // ALL RIGHTS RESERVED</div>
                         </div>
                     </footer>
                 </div>
@@ -230,7 +240,7 @@
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<LandingPage />);
+        root.render(<App />);
     </script>
 </body>
 </html>
