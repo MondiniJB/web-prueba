@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datacore Hero Section</title>
+    <title>Datacore - Premium Stays</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,9 +16,6 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
         tailwind.config = {
@@ -39,10 +36,23 @@
         }
     </script>
     <style>
-        body { margin: 0; padding: 0; overflow-x: hidden; }
-        /* Smooth transition for mobile menu */
-        .mobile-menu-enter { transform: translateX(100%); transition: transform 0.3s ease-out; }
-        .mobile-menu-active { transform: translateX(0); }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; padding: 0; background-color: #000; color: white; }
+        
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f0f0f; }
+        ::-webkit-scrollbar-thumb { background: #7b39fc; border-radius: 10px; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-glow {
+            box-shadow: 0 -20px 50px -10px rgba(123, 57, 252, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -51,37 +61,51 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        const HeroSection = () => {
+        const LandingPage = () => {
             const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [blurAmount, setBlurAmount] = useState(0);
 
-            // Icon components since we are using UMD
+            // Handle scroll to update background blur
+            useEffect(() => {
+                const handleScroll = () => {
+                    const scrollY = window.scrollY;
+                    // Max blur reached at 600px scroll
+                    const newBlur = Math.min(scrollY / 40, 12); 
+                    setBlurAmount(newBlur);
+                };
+                window.addEventListener("scroll", handleScroll);
+                return () => window.removeEventListener("scroll", handleScroll);
+            }, []);
+
+            const scrollToSection = (id) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                    setIsMenuOpen(false);
+                }
+            };
+
             const ChevronDown = () => (
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             );
-            const MenuIcon = () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-            );
-            const CloseIcon = () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-            );
 
             return (
-                <div className="relative min-h-screen w-full overflow-hidden flex flex-col items-center">
-                    {/* --- Video Background --- */}
-                    <video
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="absolute top-0 left-0 w-full h-full object-cover z-0"
+                <div className="relative w-full">
+                    {/* --- FIXED VIDEO BACKGROUND --- */}
+                    <div 
+                        className="fixed inset-0 z-0 pointer-events-none transition-all duration-300"
+                        style={{ filter: `blur(${blurAmount}px)` }}
                     >
-                        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260210_031346_d87182fb-b0af-4273-84d1-c6fd17d6bf0f.mp4" type="video/mp4" />
-                    </video>
+                        <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+                            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260210_031346_d87182fb-b0af-4273-84d1-c6fd17d6bf0f.mp4" type="video/mp4" />
+                        </video>
+                    </div>
 
-                    {/* --- Navbar --- */}
-                    <nav className="relative z-20 w-full flex items-center justify-between px-6 lg:px-[120px] py-[16px]">
-                        <div className="flex items-center">
-                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* --- NAVBAR --- */}
+                    <nav className="fixed top-0 z-50 w-full flex items-center justify-between px-6 lg:px-[120px] py-[16px] transition-all duration-300" 
+                         style={{ background: blurAmount > 1 ? 'rgba(0,0,0,0.5)' : 'transparent', backdropFilter: blurAmount > 1 ? 'blur(10px)' : 'none' }}>
+                        <div className="flex items-center cursor-pointer" onClick={() => scrollToSection('home')}>
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                                 <path d="M1.04356 6.35771L13.6437 0.666504V12.0489L1.04356 6.35771Z" fill="white"/>
                                 <path d="M18.3563 0.666504L30.9564 6.35771L18.3563 12.0489V0.666504Z" fill="white"/>
                                 <path d="M1.04356 25.6423L13.6437 31.3335V19.9511L1.04356 25.6423Z" fill="white"/>
@@ -89,92 +113,126 @@
                             </svg>
                         </div>
 
-                        {/* Desktop Links */}
-                        <div className="hidden lg:flex items-center gap-8 ml-12">
-                            {["Home", "Services", "Reviews", "Contact us"].map((link) => (
-                                <a key={link} href="#" className="font-manrope font-medium text-[14px] text-white hover:opacity-80 flex items-center gap-1 transition-opacity">
+                        <div className="hidden lg:flex items-center gap-8">
+                            {["Home", "Services", "Reviews", "Contact Us"].map((link) => (
+                                <button key={link} 
+                                        onClick={() => scrollToSection(link.toLowerCase().replace(' ', ''))}
+                                        className="font-manrope font-medium text-[14px] text-white hover:text-primary transition-colors flex items-center gap-1">
                                     {link}
                                     {link === "Services" && <ChevronDown />}
-                                </a>
+                                </button>
                             ))}
                         </div>
 
-                        {/* Desktop Actions */}
                         <div className="hidden lg:flex items-center gap-4">
-                            <button className="bg-white border border-[#d4d4d4] rounded-[8px] px-5 py-2 text-[#171717] font-manrope font-semibold text-[14px]">
+                            <button onClick={() => scrollToSection('contactus')} className="bg-white border border-[#d4d4d4] rounded-[8px] px-5 py-2 text-[#171717] font-manrope font-semibold text-[14px] hover:bg-gray-100 transition-all">
                                 Sign In
                             </button>
-                            <button className="bg-primary rounded-[8px] px-5 py-2 text-[#fafafa] font-manrope font-semibold text-[14px] shadow-lg">
+                            <button onClick={() => scrollToSection('contactus')} className="bg-primary rounded-[8px] px-5 py-2 text-[#fafafa] font-manrope font-semibold text-[14px] shadow-lg hover:brightness-110 transition-all">
                                 Get Started
-                            </button>
-                        </div>
-
-                        {/* Mobile Menu Toggle */}
-                        <div className="lg:hidden">
-                            <button onClick={() => setIsMenuOpen(true)}>
-                                <MenuIcon />
                             </button>
                         </div>
                     </nav>
 
-                    {/* --- Mobile Full-screen Overlay --- */}
-                    {isMenuOpen && (
-                        <div className="fixed inset-0 bg-black z-50 flex flex-col p-8 lg:hidden">
-                            <div className="flex justify-end">
-                                <button onClick={() => setIsMenuOpen(false)}>
-                                    <CloseIcon />
-                                </button>
+                    {/* --- SECTIONS --- */}
+                    <main className="relative z-10">
+                        
+                        {/* 1. HOME / HERO */}
+                        <section id="home" className="min-h-screen flex flex-col items-center justify-center text-center px-6">
+                            <div className="flex items-center h-[38px] px-3 gap-2 bg-[rgba(85,80,110,0.4)] backdrop-blur-md border border-[rgba(164,132,215,0.5)] rounded-[10px] mb-8">
+                                <span className="bg-primary text-white text-[10px] uppercase tracking-wider font-cabin font-medium px-2 py-1 rounded-[6px]">New</span>
+                                <span className="text-white font-cabin font-medium text-[14px]">Say Hello to Datacore v3.2</span>
                             </div>
-                            <div className="flex flex-col gap-8 mt-12 text-center">
-                                {["Home", "Services", "Reviews", "Contact us"].map((link) => (
-                                    <a key={link} href="#" className="text-white text-2xl font-manrope">{link}</a>
+                            <h1 className="text-white font-instrument text-[52px] md:text-[96px] leading-[1.1] max-w-[1000px] mb-6">
+                                Book your perfect stay instantly <span className="italic mx-1 md:mx-3">and</span> hassle-free
+                            </h1>
+                            <p className="text-white/70 font-inter font-normal text-[18px] max-w-[662px] mb-10 leading-relaxed">
+                                Discover handpicked hotels, resorts, and stays across your favorite destinations. 
+                                Enjoy exclusive deals, fast booking, and 24/7 support.
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <button onClick={() => scrollToSection('contactus')} className="bg-primary hover:brightness-110 transition-all rounded-[10px] px-8 py-4 text-white font-cabin font-medium text-[16px]">Book a Free Demo</button>
+                                <button onClick={() => scrollToSection('contactus')} className="bg-secondary hover:brightness-125 transition-all rounded-[10px] px-8 py-4 text-[#f6f7f9] font-cabin font-medium text-[16px]">Get Started Now</button>
+                            </div>
+                        </section>
+
+                        {/* 2. SERVICES */}
+                        <section id="services" className="py-32 px-6 lg:px-[120px]">
+                            <h2 className="font-instrument text-5xl md:text-7xl mb-16 text-center">Our Services</h2>
+                            <div className="grid md:grid-cols-3 gap-8">
+                                {[
+                                    { t: "Seamless Booking", d: "Real-time confirmation for over 50,000 properties worldwide." },
+                                    { t: "Concierge 24/7", d: "Personal assistance for all your travel needs, anytime, anywhere." },
+                                    { t: "Exclusive Perks", d: "Members get access to room upgrades and late check-outs." }
+                                ].map((s, i) => (
+                                    <div key={i} className="glass-card p-10 rounded-2xl">
+                                        <h3 className="font-manrope font-semibold text-2xl mb-4 text-primary">{s.t}</h3>
+                                        <p className="text-white/60 font-inter leading-relaxed">{s.d}</p>
+                                    </div>
                                 ))}
-                                <hr className="border-white/10" />
-                                <button className="w-full bg-primary text-white py-4 rounded-lg font-manrope font-semibold">Get Started</button>
-                                <button className="w-full bg-white text-black py-4 rounded-lg font-manrope font-semibold">Sign In</button>
+                            </div>
+                        </section>
+
+                        {/* 3. REVIEWS */}
+                        <section id="reviews" className="py-32 px-6 lg:px-[120px] bg-black/30 backdrop-blur-sm">
+                            <h2 className="font-instrument text-5xl md:text-7xl mb-16 text-center">Guest Experiences</h2>
+                            <div className="flex flex-col md:flex-row gap-8 overflow-x-auto pb-8">
+                                {[
+                                    { name: "Sarah J.", text: "The most effortless booking I've ever had. The UI is just beautiful." },
+                                    { name: "Marcus T.", text: "Found a hidden gem in Italy thanks to Datacore. Highly recommend!" },
+                                    { name: "Elena R.", text: "24/7 support actually means 24/7. They saved my honeymoon!" }
+                                ].map((r, i) => (
+                                    <div key={i} className="min-w-[300px] flex-1 glass-card p-8 rounded-2xl italic font-inter text-lg">
+                                        "{r.text}"
+                                        <div className="mt-6 not-italic font-manrope font-bold text-sm text-primary uppercase">— {r.name}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* 4. CONTACT US */}
+                        <section id="contactus" className="py-32 px-6 lg:px-[120px]">
+                            <div className="max-w-4xl mx-auto glass-card p-12 rounded-[24px] border-primary/20">
+                                <h2 className="font-instrument text-5xl mb-8 text-center">Ready to explore?</h2>
+                                <p className="text-center text-white/60 mb-12 font-inter">Drop your details below and our team will get back to you within 24 hours.</p>
+                                <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={(e) => e.preventDefault()}>
+                                    <input type="text" placeholder="Your Name" className="bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-primary transition-all font-inter" />
+                                    <input type="email" placeholder="Email Address" className="bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-primary transition-all font-inter" />
+                                    <textarea placeholder="How can we help?" className="md:col-span-2 bg-white/5 border border-white/10 p-4 rounded-xl h-32 focus:outline-none focus:border-primary transition-all font-inter"></textarea>
+                                    <button className="md:col-span-2 bg-primary py-4 rounded-xl font-manrope font-semibold text-lg hover:brightness-110 shadow-lg transition-all">Send Message</button>
+                                </form>
+                            </div>
+                        </section>
+                    </main>
+
+                    {/* --- FOOTER --- */}
+                    <footer className="relative z-10 footer-glow border-t border-white/10 bg-black py-16 px-6 lg:px-[120px]">
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+                            <div className="flex items-center gap-4">
+                                <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+                                    <path d="M1.04356 6.35771L13.6437 0.666504V12.0489L1.04356 6.35771Z" fill="#7b39fc"/>
+                                    <path d="M18.3563 0.666504L30.9564 6.35771L18.3563 12.0489V0.666504Z" fill="#7b39fc"/>
+                                </svg>
+                                <span className="font-manrope font-bold text-xl tracking-tighter">DATACORE</span>
+                            </div>
+                            
+                            <div className="flex gap-8 text-white/40 font-manrope text-xs">
+                                <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                                <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                                <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+                            </div>
+
+                            <div className="text-white/40 font-manrope text-xs">
+                                &copy; 2026 Datacore Technologies Inc. All rights reserved.
                             </div>
                         </div>
-                    )}
-
-                    {/* --- Hero Content --- */}
-                    <div className="relative z-10 flex flex-col items-center text-center mt-32 px-6 max-w-[1200px]">
-                        {/* Tagline Pill */}
-                        <div className="flex items-center h-[38px] px-3 gap-2 bg-[rgba(85,80,110,0.4)] backdrop-blur-md border border-[rgba(164,132,215,0.5)] rounded-[10px] mb-8">
-                            <span className="bg-primary text-white text-[10px] uppercase tracking-wider font-cabin font-medium px-2 py-1 rounded-[6px]">
-                                New
-                            </span>
-                            <span className="text-white font-cabin font-medium text-[14px]">
-                                Say Hello to Datacore v3.2
-                            </span>
-                        </div>
-
-                        {/* Headline */}
-                        <h1 className="text-white font-instrument text-[52px] md:text-[96px] leading-[1.1] max-w-[1000px] mb-6">
-                            Book your perfect stay instantly <span className="italic mx-1 md:mx-3">and</span> hassle-free
-                        </h1>
-
-                        {/* Subtext */}
-                        <p className="text-white/70 font-inter font-normal text-[18px] max-w-[662px] mb-10 leading-relaxed">
-                            Discover handpicked hotels, resorts, and stays across your favorite destinations. 
-                            Enjoy exclusive deals, fast booking, and 24/7 support.
-                        </p>
-
-                        {/* CTA Row */}
-                        <div className="flex flex-col sm:flex-row gap-4 mb-20">
-                            <button className="bg-primary hover:brightness-110 transition-all rounded-[10px] px-8 py-4 text-white font-cabin font-medium text-[16px]">
-                                Book a Free Demo
-                            </button>
-                            <button className="bg-secondary hover:brightness-125 transition-all rounded-[10px] px-8 py-4 text-[#f6f7f9] font-cabin font-medium text-[16px]">
-                                Get Started Now
-                            </button>
-                        </div>
-                    </div>
+                    </footer>
                 </div>
             );
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<HeroSection />);
+        root.render(<LandingPage />);
     </script>
 </body>
 </html>
