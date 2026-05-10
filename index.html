@@ -7,7 +7,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500&family=Instrument+Serif:ital@0;1&family=Inter:wght@400&family=Manrope:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Inter:wght@400&family=Manrope:wght@500;600&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,7 +28,7 @@
                     fontFamily: {
                         manrope: ['Manrope', 'sans-serif'],
                         cabin: ['Cabin', 'sans-serif'],
-                        instrument: ['Instrument Serif', 'serif'],
+                        extended: ['Cormorant Garamond', 'serif'],
                         inter: ['Inter', 'sans-serif'],
                     }
                 }
@@ -39,19 +39,50 @@
         html { scroll-behavior: smooth; }
         body { margin: 0; padding: 0; background-color: #000; color: white; }
         
-        /* Custom scrollbar for a cleaner look */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f0f0f; }
-        ::-webkit-scrollbar-thumb { background: #7b39fc; border-radius: 10px; }
+        /* High-opacity background for better readability */
+        .glass-card-solid {
+            background: rgba(15, 12, 25, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(164, 132, 215, 0.2);
+        }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Animated Glowing Border Effect */
+        .animated-border-box {
+            position: relative;
+            padding: 2px;
+            overflow: hidden;
+            border-radius: 26px;
+        }
+
+        .animated-border-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                transparent, 
+                transparent, 
+                transparent, 
+                #7b39fc
+            );
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .inner-content {
+            position: relative;
+            z-index: 1;
+            background: rgb(15, 12, 25);
+            border-radius: 24px;
         }
 
         .footer-glow {
-            box-shadow: 0 -20px 50px -10px rgba(123, 57, 252, 0.2);
+            box-shadow: 0 -30px 60px -10px rgba(123, 57, 252, 0.3);
         }
     </style>
 </head>
@@ -62,16 +93,11 @@
         const { useState, useEffect } = React;
 
         const LandingPage = () => {
-            const [isMenuOpen, setIsMenuOpen] = useState(false);
             const [blurAmount, setBlurAmount] = useState(0);
 
-            // Handle scroll to update background blur
             useEffect(() => {
                 const handleScroll = () => {
-                    const scrollY = window.scrollY;
-                    // Max blur reached at 600px scroll
-                    const newBlur = Math.min(scrollY / 40, 12); 
-                    setBlurAmount(newBlur);
+                    setBlurAmount(Math.min(window.scrollY / 30, 15));
                 };
                 window.addEventListener("scroll", handleScroll);
                 return () => window.removeEventListener("scroll", handleScroll);
@@ -79,151 +105,127 @@
 
             const scrollToSection = (id) => {
                 const element = document.getElementById(id);
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                    setIsMenuOpen(false);
-                }
+                if (element) element.scrollIntoView({ behavior: 'smooth' });
             };
 
             const ChevronDown = () => (
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 9 6 6 6-6"/></svg>
             );
 
             return (
                 <div className="relative w-full">
-                    {/* --- FIXED VIDEO BACKGROUND --- */}
-                    <div 
-                        className="fixed inset-0 z-0 pointer-events-none transition-all duration-300"
-                        style={{ filter: `blur(${blurAmount}px)` }}
-                    >
+                    {/* VIDEO BACKGROUND */}
+                    <div className="fixed inset-0 z-0 pointer-events-none" style={{ filter: `blur(${blurAmount}px)` }}>
                         <video autoPlay loop muted playsInline className="w-full h-full object-cover">
                             <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260210_031346_d87182fb-b0af-4273-84d1-c6fd17d6bf0f.mp4" type="video/mp4" />
                         </video>
                     </div>
 
-                    {/* --- NAVBAR --- */}
-                    <nav className="fixed top-0 z-50 w-full flex items-center justify-between px-6 lg:px-[120px] py-[16px] transition-all duration-300" 
-                         style={{ background: blurAmount > 1 ? 'rgba(0,0,0,0.5)' : 'transparent', backdropFilter: blurAmount > 1 ? 'blur(10px)' : 'none' }}>
+                    {/* NAVBAR */}
+                    <nav className="fixed top-0 z-50 w-full flex items-center justify-between px-6 lg:px-[120px] py-[20px] bg-black/40 backdrop-blur-xl">
                         <div className="flex items-center cursor-pointer" onClick={() => scrollToSection('home')}>
-                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                                <path d="M1.04356 6.35771L13.6437 0.666504V12.0489L1.04356 6.35771Z" fill="white"/>
-                                <path d="M18.3563 0.666504L30.9564 6.35771L18.3563 12.0489V0.666504Z" fill="white"/>
-                                <path d="M1.04356 25.6423L13.6437 31.3335V19.9511L1.04356 25.6423Z" fill="white"/>
-                                <path d="M18.3563 31.3335L30.9564 25.6423L18.3563 19.9511V31.3335Z" fill="white"/>
-                            </svg>
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M1.04356 6.35771L13.6437 0.666504V12.0489L1.04356 6.35771Z" fill="white"/><path d="M18.3563 0.666504L30.9564 6.35771L18.3563 12.0489V0.666504Z" fill="white"/><path d="M1.04356 25.6423L13.6437 31.3335V19.9511L1.04356 25.6423Z" fill="white"/><path d="M18.3563 31.3335L30.9564 25.6423L18.3563 19.9511V31.3335Z" fill="white"/></svg>
                         </div>
-
-                        <div className="hidden lg:flex items-center gap-8">
+                        <div className="hidden lg:flex items-center gap-10">
                             {["Home", "Services", "Reviews", "Contact Us"].map((link) => (
-                                <button key={link} 
-                                        onClick={() => scrollToSection(link.toLowerCase().replace(' ', ''))}
-                                        className="font-manrope font-medium text-[14px] text-white hover:text-primary transition-colors flex items-center gap-1">
-                                    {link}
-                                    {link === "Services" && <ChevronDown />}
-                                </button>
+                                <button key={link} onClick={() => scrollToSection(link.toLowerCase().replace(' ', ''))} className="font-manrope font-medium text-[14px] hover:text-primary transition-colors flex items-center gap-1">{link}{link === "Services" && <ChevronDown />}</button>
                             ))}
                         </div>
-
                         <div className="hidden lg:flex items-center gap-4">
-                            <button onClick={() => scrollToSection('contactus')} className="bg-white border border-[#d4d4d4] rounded-[8px] px-5 py-2 text-[#171717] font-manrope font-semibold text-[14px] hover:bg-gray-100 transition-all">
-                                Sign In
-                            </button>
-                            <button onClick={() => scrollToSection('contactus')} className="bg-primary rounded-[8px] px-5 py-2 text-[#fafafa] font-manrope font-semibold text-[14px] shadow-lg hover:brightness-110 transition-all">
-                                Get Started
-                            </button>
+                            <button onClick={() => scrollToSection('contactus')} className="bg-white px-6 py-2.5 rounded-[8px] text-black font-manrope font-semibold text-[14px] hover:bg-gray-200">Sign In</button>
+                            <button onClick={() => scrollToSection('contactus')} className="bg-primary px-6 py-2.5 rounded-[8px] text-white font-manrope font-semibold text-[14px] shadow-lg">Get Started</button>
                         </div>
                     </nav>
 
-                    {/* --- SECTIONS --- */}
+                    {/* CONTENT */}
                     <main className="relative z-10">
                         
-                        {/* 1. HOME / HERO */}
+                        {/* HERO */}
                         <section id="home" className="min-h-screen flex flex-col items-center justify-center text-center px-6">
-                            <div className="flex items-center h-[38px] px-3 gap-2 bg-[rgba(85,80,110,0.4)] backdrop-blur-md border border-[rgba(164,132,215,0.5)] rounded-[10px] mb-8">
-                                <span className="bg-primary text-white text-[10px] uppercase tracking-wider font-cabin font-medium px-2 py-1 rounded-[6px]">New</span>
-                                <span className="text-white font-cabin font-medium text-[14px]">Say Hello to Datacore v3.2</span>
+                            <div className="glass-card-solid px-4 py-2 rounded-full mb-8 border border-primary/30">
+                                <span className="text-primary font-bold mr-2 text-sm">NEW</span>
+                                <span className="font-cabin text-sm">Experience Datacore v3.2</span>
                             </div>
-                            <h1 className="text-white font-instrument text-[52px] md:text-[96px] leading-[1.1] max-w-[1000px] mb-6">
-                                Book your perfect stay instantly <span className="italic mx-1 md:mx-3">and</span> hassle-free
+                            <h1 className="font-extended text-[64px] md:text-[110px] leading-[1.0] max-w-[1100px] mb-8">
+                                Book your perfect stay instantly <span className="italic">and</span> hassle-free
                             </h1>
-                            <p className="text-white/70 font-inter font-normal text-[18px] max-w-[662px] mb-10 leading-relaxed">
-                                Discover handpicked hotels, resorts, and stays across your favorite destinations. 
-                                Enjoy exclusive deals, fast booking, and 24/7 support.
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <button onClick={() => scrollToSection('contactus')} className="bg-primary hover:brightness-110 transition-all rounded-[10px] px-8 py-4 text-white font-cabin font-medium text-[16px]">Book a Free Demo</button>
-                                <button onClick={() => scrollToSection('contactus')} className="bg-secondary hover:brightness-125 transition-all rounded-[10px] px-8 py-4 text-[#f6f7f9] font-cabin font-medium text-[16px]">Get Started Now</button>
+                            <p className="text-white/80 font-inter text-xl max-w-[700px] mb-12">Luxury resorts and handpicked hotels curated for the modern traveler.</p>
+                            <div className="flex gap-6">
+                                <button onClick={() => scrollToSection('contactus')} className="bg-primary px-10 py-5 rounded-xl font-cabin text-lg hover:scale-105 transition-transform">Book Now</button>
+                                <button onClick={() => scrollToSection('services')} className="bg-white/10 backdrop-blur px-10 py-5 rounded-xl font-cabin text-lg border border-white/20">Explore</button>
                             </div>
                         </section>
 
-                        {/* 2. SERVICES */}
-                        <section id="services" className="py-32 px-6 lg:px-[120px]">
-                            <h2 className="font-instrument text-5xl md:text-7xl mb-16 text-center">Our Services</h2>
-                            <div className="grid md:grid-cols-3 gap-8">
+                        {/* SERVICES */}
+                        <section id="services" className="py-48 px-6 lg:px-[120px]">
+                            <h2 className="font-extended text-6xl md:text-8xl mb-24 text-center">Premium Services</h2>
+                            <div className="grid lg:grid-cols-3 gap-10">
                                 {[
-                                    { t: "Seamless Booking", d: "Real-time confirmation for over 50,000 properties worldwide." },
-                                    { t: "Concierge 24/7", d: "Personal assistance for all your travel needs, anytime, anywhere." },
-                                    { t: "Exclusive Perks", d: "Members get access to room upgrades and late check-outs." }
+                                    { t: "Smart Concierge", d: "AI-driven local guides available 24/7 for every guest.", img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" },
+                                    { t: "Private Resorts", d: "Access to islands and estates not listed on public markets.", img: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=800&q=80" },
+                                    { t: "Seamless Travel", d: "Integrated flight and ground transport at your fingertips.", img: "https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?auto=format&fit=crop&w=800&q=80" }
                                 ].map((s, i) => (
-                                    <div key={i} className="glass-card p-10 rounded-2xl">
-                                        <h3 className="font-manrope font-semibold text-2xl mb-4 text-primary">{s.t}</h3>
-                                        <p className="text-white/60 font-inter leading-relaxed">{s.d}</p>
+                                    <div key={i} className="glass-card-solid rounded-3xl overflow-hidden group">
+                                        <div className="h-64 overflow-hidden">
+                                            <img src={s.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80" />
+                                        </div>
+                                        <div className="p-10">
+                                            <h3 className="font-extended text-3xl mb-4 text-primary italic">{s.t}</h3>
+                                            <p className="text-white/70 font-inter leading-relaxed text-lg">{s.d}</p>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         </section>
 
-                        {/* 3. REVIEWS */}
-                        <section id="reviews" className="py-32 px-6 lg:px-[120px] bg-black/30 backdrop-blur-sm">
-                            <h2 className="font-instrument text-5xl md:text-7xl mb-16 text-center">Guest Experiences</h2>
-                            <div className="flex flex-col md:flex-row gap-8 overflow-x-auto pb-8">
-                                {[
-                                    { name: "Sarah J.", text: "The most effortless booking I've ever had. The UI is just beautiful." },
-                                    { name: "Marcus T.", text: "Found a hidden gem in Italy thanks to Datacore. Highly recommend!" },
-                                    { name: "Elena R.", text: "24/7 support actually means 24/7. They saved my honeymoon!" }
-                                ].map((r, i) => (
-                                    <div key={i} className="min-w-[300px] flex-1 glass-card p-8 rounded-2xl italic font-inter text-lg">
-                                        "{r.text}"
-                                        <div className="mt-6 not-italic font-manrope font-bold text-sm text-primary uppercase">— {r.name}</div>
-                                    </div>
-                                ))}
+                        {/* REVIEWS */}
+                        <section id="reviews" className="py-48 px-6 lg:px-[120px] bg-black/40 backdrop-blur-md">
+                            <h2 className="font-extended text-6xl md:text-8xl mb-24 text-center italic">What Guests Say</h2>
+                            <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                                <div className="glass-card-solid p-12 rounded-[40px] border-l-4 border-l-primary">
+                                    <p className="text-2xl font-extended italic mb-8">"The attention to detail is unmatched. I booked a villa in Bali within seconds, and the concierge had a driver waiting for me before I even landed."</p>
+                                    <span className="font-manrope font-bold text-primary">— JONATHAN V.</span>
+                                </div>
+                                <div className="glass-card-solid p-12 rounded-[40px] border-l-4 border-l-primary">
+                                    <p className="text-2xl font-extended italic mb-8">"Finally, a platform that understands luxury isn't just about the price, it's about the experience. Truly hassle-free from start to finish."</p>
+                                    <span className="font-manrope font-bold text-primary">— AMARA K.</span>
+                                </div>
                             </div>
                         </section>
 
-                        {/* 4. CONTACT US */}
-                        <section id="contactus" className="py-32 px-6 lg:px-[120px]">
-                            <div className="max-w-4xl mx-auto glass-card p-12 rounded-[24px] border-primary/20">
-                                <h2 className="font-instrument text-5xl mb-8 text-center">Ready to explore?</h2>
-                                <p className="text-center text-white/60 mb-12 font-inter">Drop your details below and our team will get back to you within 24 hours.</p>
-                                <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={(e) => e.preventDefault()}>
-                                    <input type="text" placeholder="Your Name" className="bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-primary transition-all font-inter" />
-                                    <input type="email" placeholder="Email Address" className="bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-primary transition-all font-inter" />
-                                    <textarea placeholder="How can we help?" className="md:col-span-2 bg-white/5 border border-white/10 p-4 rounded-xl h-32 focus:outline-none focus:border-primary transition-all font-inter"></textarea>
-                                    <button className="md:col-span-2 bg-primary py-4 rounded-xl font-manrope font-semibold text-lg hover:brightness-110 shadow-lg transition-all">Send Message</button>
-                                </form>
+                        {/* CONTACT US (Glowing Border) */}
+                        <section id="contactus" className="py-48 px-6 lg:px-[120px]">
+                            <div className="max-w-4xl mx-auto animated-border-box shadow-[0_0_50px_-12px_rgba(123,57,252,0.5)]">
+                                <div className="inner-content p-12 md:p-20">
+                                    <h2 className="font-extended text-5xl md:text-7xl mb-6 text-center italic">Get in Touch</h2>
+                                    <p className="text-center text-white/60 mb-12 font-inter text-lg">Leave a message and our premium support team will contact you shortly.</p>
+                                    <form className="space-y-6" onSubmit={e => e.preventDefault()}>
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <input type="text" placeholder="Name" className="bg-white/5 border border-white/10 p-5 rounded-xl focus:border-primary outline-none transition-all" />
+                                            <input type="email" placeholder="Email" className="bg-white/5 border border-white/10 p-5 rounded-xl focus:border-primary outline-none transition-all" />
+                                        </div>
+                                        <textarea placeholder="Message" className="w-full bg-white/5 border border-white/10 p-5 rounded-xl h-40 focus:border-primary outline-none transition-all"></textarea>
+                                        <button className="w-full bg-primary py-5 rounded-xl font-manrope font-bold text-xl hover:brightness-110 transition-all">Submit Request</button>
+                                    </form>
+                                </div>
                             </div>
                         </section>
                     </main>
 
-                    {/* --- FOOTER --- */}
-                    <footer className="relative z-10 footer-glow border-t border-white/10 bg-black py-16 px-6 lg:px-[120px]">
-                        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+                    {/* FOOTER */}
+                    <footer className="relative z-10 footer-glow bg-black border-t border-white/10 py-20 px-6 lg:px-[120px]">
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-10">
                             <div className="flex items-center gap-4">
-                                <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-                                    <path d="M1.04356 6.35771L13.6437 0.666504V12.0489L1.04356 6.35771Z" fill="#7b39fc"/>
-                                    <path d="M18.3563 0.666504L30.9564 6.35771L18.3563 12.0489V0.666504Z" fill="#7b39fc"/>
-                                </svg>
-                                <span className="font-manrope font-bold text-xl tracking-tighter">DATACORE</span>
+                                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-bold">D</div>
+                                <span className="font-extended text-2xl tracking-widest italic">DATACORE</span>
                             </div>
-                            
-                            <div className="flex gap-8 text-white/40 font-manrope text-xs">
-                                <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-                                <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-                                <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+                            <div className="flex gap-10 text-white/40 text-sm font-manrope">
+                                <a href="#" className="hover:text-primary">Privacy</a>
+                                <a href="#" className="hover:text-primary">Legal</a>
+                                <a href="#" className="hover:text-primary">Terms</a>
                             </div>
-
-                            <div className="text-white/40 font-manrope text-xs">
-                                &copy; 2026 Datacore Technologies Inc. All rights reserved.
+                            <div className="text-white/30 text-xs font-inter">
+                                © 2026 Datacore Technologies. All rights reserved.
                             </div>
                         </div>
                     </footer>
