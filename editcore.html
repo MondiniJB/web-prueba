@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EditCore - Creative Career Masterclass</title>
+    <title>EditCore - Masterclass 2026</title>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500;600&family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@400&family=Manrope:wght@500;700&display=swap" rel="stylesheet">
@@ -30,22 +29,10 @@
         html { scroll-behavior: smooth; }
         body { background-color: #05020a; color: white; overflow-x: hidden; }
         
-        /* Cinematic Noise Overlay */
         .noise {
             position: fixed; inset: 0; width: 100%; height: 100%;
             background: url('https://grainy-gradients.vercel.app/noise.svg');
             opacity: 0.22; pointer-events: none; z-index: 90; filter: contrast(180%) brightness(110%);
-        }
-
-        /* Continuous Motion Carousel */
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-            display: flex;
-            width: max-content;
-            animation: marquee 35s linear infinite;
         }
 
         /* Thick Animated Glowing Border */
@@ -63,8 +50,11 @@
         .glowing-inner { 
             position: relative; z-index: 10; background: #080512; border-radius: 26px; 
         }
-        
-        .section-view { min-height: 100vh; display: flex; align-items: center; justify-content: center; width: 100%; }
+
+        /* Draggable Carousel Styles */
+        .no-select { user-select: none; -webkit-user-drag: none; }
+        .active-drag { cursor: grabbing !important; }
+        .carousel-item { flex: 0 0 auto; width: 500px; height: 300px; }
     </style>
 </head>
 <body>
@@ -74,13 +64,16 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
+        const { motion } = FramerMotion;
 
-        const EditCoreApp = () => {
+        const App = () => {
             const [selected, setSelected] = useState([]);
             const [blur, setBlur] = useState(0);
+            const carouselRef = useRef(null);
 
             useEffect(() => {
                 const handleScroll = () => setBlur(Math.min(window.scrollY / 20, 25));
@@ -97,6 +90,14 @@
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             };
 
+            const demoClips = [
+                "https://cdn.pixabay.com/video/2021/04/12/70796-537482343_large.mp4",
+                "https://cdn.pixabay.com/video/2020/11/17/55648-477546022_large.mp4",
+                "https://cdn.pixabay.com/video/2021/09/14/88561-605891392_large.mp4",
+                "https://cdn.pixabay.com/video/2023/10/21/185934-877209639_large.mp4",
+                "https://cdn.pixabay.com/video/2020/05/25/40141-425026937_large.mp4"
+            ];
+
             return (
                 <div className="relative">
                     {/* VIDEO BACKGROUND */}
@@ -108,29 +109,22 @@
 
                     {/* NAVBAR */}
                     <nav className="fixed top-0 z-[100] w-full flex items-center justify-between px-6 lg:px-[120px] py-6 bg-black/60 backdrop-blur-2xl border-b border-white/5">
-                        <div className="font-manrope font-black tracking-tighter text-2xl cursor-pointer italic" onClick={() => window.scrollTo(0,0)}>
-                            EDITCORE.
-                        </div>
+                        <div className="font-manrope font-black tracking-tighter text-2xl cursor-pointer italic" onClick={() => window.scrollTo(0,0)}>EDITCORE.</div>
                         <div className="hidden lg:flex gap-12 font-manrope font-bold text-[10px] tracking-[0.4em] uppercase text-white/40">
                             <button onClick={() => jumpTo('courses')} className="hover:text-primary transition-all">Syllabus</button>
                             <button onClick={() => jumpTo('gallery')} className="hover:text-primary transition-all">Gallery</button>
                             <button onClick={() => jumpTo('career')} className="hover:text-primary transition-all">Join</button>
                         </div>
-                        <button onClick={() => jumpTo('career')} className="bg-primary px-8 py-3 rounded-full font-manrope font-bold text-[10px] uppercase tracking-widest hover:shadow-[0_0_30px_#7b39fc] transition-all">
-                            Apply Now
-                        </button>
+                        <button onClick={() => jumpTo('career')} className="bg-primary px-8 py-3 rounded-full font-manrope font-bold text-[10px] uppercase tracking-widest hover:shadow-[0_0_30px_#7b39fc] transition-all">Apply Now</button>
                     </nav>
 
                     {/* HERO */}
-                    <section className="section-view relative z-10 px-6">
+                    <section className="min-h-screen flex items-center justify-center relative z-10 px-6">
                         <div className="text-center">
                             <div className="inline-block bg-white/5 border border-white/10 px-6 py-2 rounded-full mb-10 backdrop-blur-md">
                                 <span className="font-manrope text-[9px] font-bold tracking-[0.5em] text-white/60 uppercase">The Editing Masterclass 2026</span>
                             </div>
-                            <h1 className="font-instrument text-[55px] md:text-[110px] leading-[0.9] max-w-[1100px] mb-10">
-                                Launch your <span className="italic">Creative</span> career today.
-                            </h1>
-                            <p className="text-white/60 font-inter text-xl md:text-2xl max-w-2xl mx-auto mb-14 leading-relaxed">High-performance training for After Effects, Premiere Pro, and FL Studio.</p>
+                            <h1 className="font-instrument text-[55px] md:text-[110px] leading-[0.9] max-w-[1100px] mb-10">Launch your <span className="italic">Creative</span> career today.</h1>
                             <div className="flex flex-col sm:flex-row justify-center gap-6">
                                 <button onClick={() => jumpTo('courses')} className="bg-primary px-12 py-6 rounded-2xl font-manrope font-bold text-xs tracking-widest uppercase hover:scale-105 transition-all">View Courses</button>
                                 <button onClick={() => jumpTo('gallery')} className="bg-white/5 border border-white/20 px-12 py-6 rounded-2xl font-manrope font-bold text-xs tracking-widest uppercase hover:bg-white/10 transition-all">Watch Demos</button>
@@ -139,7 +133,7 @@
                     </section>
 
                     {/* COURSES */}
-                    <section id="courses" className="section-view relative z-10 px-6 lg:px-[120px] py-32">
+                    <section id="courses" className="min-h-screen flex items-center justify-center relative z-10 px-6 lg:px-[120px] py-32">
                         <div className="w-full">
                             <h2 className="font-instrument text-7xl md:text-9xl text-center mb-28 italic">The Toolkit</h2>
                             <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -158,25 +152,29 @@
                         </div>
                     </section>
 
-                    {/* GALLERY (REAL GIFS) */}
-                    <section id="gallery" className="py-48 overflow-hidden z-10 bg-black/30 border-y border-white/5 relative">
-                        <h2 className="font-instrument text-7xl md:text-9xl text-center mb-24 italic">Motion GFX</h2>
-                        <div className="animate-marquee gap-10">
-                            {[
-                                "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJocXJ5dmRscXJpYXRreHh3dHBxcHFwcHFwcHFwcHFwcHFwcHFwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKMGpxVfFvTdf4k/giphy.gif",
-                                "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJocXJ5dmRscXJpYXRreHh3dHBxcHFwcHFwcHFwcHFwcHFwcHFwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l41lTjJptGZ2s7a5W/giphy.gif",
-                                "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJocXJ5dmRscXJpYXRreHh3dHBxcHFwcHFwcHFwcHFwcHFwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26uf404O4J8oOQ6Nq/giphy.gif",
-                                "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJocXJ5dmRscXJpYXRreHh3dHBxcHFwcHFwcHFwcHFwcHFwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKVUn7iM8FMEU24/giphy.gif"
-                            ].map((url, i) => (
-                                <div key={i} className="w-[600px] h-[350px] bg-zinc-900 rounded-[32px] overflow-hidden border-2 border-white/10 group shadow-2xl flex-shrink-0">
-                                    <img src={url} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700 grayscale group-hover:grayscale-0" />
-                                </div>
-                            ))}
+                    {/* GALLERY (DRAGGABLE - NO BG RECTANGLE) */}
+                    <section id="gallery" className="py-48 z-10 relative">
+                        <h2 className="font-instrument text-7xl md:text-9xl text-center mb-24 italic">Motion Power</h2>
+                        
+                        <div className="overflow-hidden cursor-grab active:cursor-grabbing px-10">
+                            <motion.div 
+                                drag="x" 
+                                dragConstraints={{ right: 0, left: -1800 }}
+                                className="flex gap-10 w-max"
+                            >
+                                {demoClips.concat(demoClips).map((url, i) => (
+                                    <div key={i} className="carousel-item bg-zinc-900 rounded-[32px] overflow-hidden border-2 border-white/10 shadow-2xl no-select pointer-events-none">
+                                        <video autoPlay loop muted playsInline className="w-full h-full object-cover no-select">
+                                            <source src={url} type="video/mp4" />
+                                        </video>
+                                    </div>
+                                ))}
+                            </motion.div>
                         </div>
                     </section>
 
                     {/* CONTACT (CAREER START) */}
-                    <section id="career" className="section-view relative z-10 px-6 lg:px-[120px] bg-black">
+                    <section id="career" className="min-h-screen flex items-center justify-center relative z-10 px-6 lg:px-[120px] bg-black">
                         <div className="max-w-4xl w-full glowing-container">
                             <div className="glowing-inner p-10 md:p-16">
                                 <h2 className="font-instrument text-5xl md:text-7xl text-center mb-6 italic">Start your career now!</h2>
@@ -204,21 +202,16 @@
                                         </div>
                                     </div>
 
-                                    <button className="w-full bg-primary py-6 rounded-2xl font-manrope font-bold text-sm tracking-[0.4em] uppercase hover:shadow-[0_0_50px_#7b39fc] transition-all">
-                                        Request Enrollment
-                                    </button>
+                                    <button className="w-full bg-primary py-6 rounded-2xl font-manrope font-bold text-sm tracking-[0.4em] uppercase hover:shadow-[0_0_50px_#7b39fc] transition-all">Request Enrollment</button>
                                 </form>
                             </div>
                         </div>
                     </section>
 
-                    {/* FOOTER */}
                     <footer className="relative py-24 border-t border-white/5 bg-[#050505] z-10 px-10">
-                        <div className="flex flex-col md:flex-row justify-between items-center gap-10">
-                            <div className="font-manrope font-black text-xl italic opacity-20 tracking-tighter">EDITCORE.</div>
-                            <div className="flex gap-12 text-[10px] font-manrope font-bold text-white/20 tracking-widest uppercase">
-                                <span>© 2026 EDITCORE DIGITAL</span>
-                            </div>
+                        <div className="flex justify-between items-center text-[10px] font-manrope font-bold text-white/20 tracking-widest uppercase">
+                            <div className="italic">EDITCORE.</div>
+                            <span>© 2026 EDITCORE DIGITAL</span>
                         </div>
                     </footer>
                 </div>
@@ -226,7 +219,7 @@
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<EditCoreApp />);
+        root.render(<App />);
     </script>
 </body>
 </html>
