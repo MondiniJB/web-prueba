@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datacore - Premium Stays</title>
+    <title>Datacore - Vintage Digital</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Inter:wght@400&family=Manrope:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500&family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@400&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,7 +23,7 @@
                     fontFamily: {
                         manrope: ['Manrope', 'sans-serif'],
                         cabin: ['Cabin', 'sans-serif'],
-                        extended: ['Cormorant Garamond', 'serif'],
+                        instrument: ['Instrument Serif', 'serif'],
                         inter: ['Inter', 'sans-serif'],
                     }
                 }
@@ -33,42 +33,47 @@
     
     <style>
         html { scroll-behavior: smooth; }
-        body { margin: 0; padding: 0; background-color: #000; color: white; overflow-x: hidden; }
+        body { margin: 0; padding: 0; background-color: #05020a; color: white; overflow-x: hidden; }
         
-        .glass-card-solid {
-            background: rgba(12, 10, 20, 0.95);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(164, 132, 215, 0.25);
+        /* --- NOISE/GRAIN OVERLAY --- */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 90;
+            filter: contrast(150%) brightness(100%);
         }
 
-        /* --- THE ULTRA GLOW ANIMATED BORDER --- */
+        /* --- SHINY GLOW EFFECTS --- */
+        .glow-text {
+            text-shadow: 0 0 20px rgba(123, 57, 252, 0.5), 0 0 40px rgba(123, 57, 252, 0.2);
+        }
+
+        .shiny-card {
+            background: rgba(25, 15, 40, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(164, 132, 215, 0.3);
+            box-shadow: 0 0 30px rgba(123, 57, 252, 0.1);
+        }
+
+        /* --- ULTRA GLOW CONTACT BORDER --- */
         .glowing-container {
             position: relative;
-            padding: 4px; /* Thickness of the border */
-            border-radius: 32px;
+            padding: 3px;
+            border-radius: 24px;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.05);
-            /* Outer Glow */
-            box-shadow: 0 0 40px -10px rgba(123, 57, 252, 0.6);
+            box-shadow: 0 0 60px -10px rgba(123, 57, 252, 0.8);
         }
 
-        /* The moving light beam */
         .glowing-container::before {
             content: '';
             position: absolute;
-            width: 150%;
-            height: 150%;
-            background-image: conic-gradient(
-                transparent, 
-                rgba(123, 57, 252, 0.2), 
-                #7b39fc, 
-                #bc9cff, 
-                #7b39fc, 
-                transparent 30%
-            );
-            top: -25%;
-            left: -25%;
-            animation: borderRotate 3s linear infinite;
+            width: 200%; height: 200%;
+            background: conic-gradient(transparent, #7b39fc, #fff, #7b39fc, transparent 40%);
+            top: -50%; left: -50%;
+            animation: borderRotate 2.5s linear infinite;
         }
 
         @keyframes borderRotate {
@@ -76,27 +81,26 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Inner content mask */
         .glowing-inner {
             position: relative;
             z-index: 10;
-            background: #0a0812;
-            border-radius: 28px;
-            width: 100%;
-            height: 100%;
+            background: #080510;
+            border-radius: 21px;
         }
 
         .footer-glow {
-            box-shadow: 0 -30px 100px -20px rgba(123, 57, 252, 0.4);
+            box-shadow: 0 -30px 100px -20px rgba(123, 57, 252, 0.5);
         }
 
-        .section-spacer { padding-top: 160px; padding-bottom: 160px; }
+        /* Responsive height fix for contact section */
+        #contactus { min-height: 100vh; display: flex; align-items: center; }
     </style>
 </head>
 <body>
     <div id="root"></div>
+    <div class="noise-overlay"></div>
 
-    <!-- React & Babel CDNs -->
+    <!-- React & Babel -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -109,7 +113,7 @@
 
             useEffect(() => {
                 const handleScroll = () => {
-                    setBlurAmount(Math.min(window.scrollY / 25, 20));
+                    setBlurAmount(Math.min(window.scrollY / 20, 25));
                 };
                 window.addEventListener("scroll", handleScroll);
                 return () => window.removeEventListener("scroll", handleScroll);
@@ -123,25 +127,24 @@
             return (
                 <div className="relative w-full">
                     {/* VIDEO BACKGROUND */}
-                    <div className="fixed inset-0 z-0 pointer-events-none" style={{ filter: `blur(${blurAmount}px)` }}>
-                        <video autoPlay loop muted playsInline className="w-full h-full object-cover brightness-[0.7]">
+                    <div className="fixed inset-0 z-0 pointer-events-none" style={{ filter: `blur(${blurAmount}px) sepia(20%)` }}>
+                        <video autoPlay loop muted playsInline className="w-full h-full object-cover brightness-[0.5]">
                             <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260210_031346_d87182fb-b0af-4273-84d1-c6fd17d6bf0f.mp4" type="video/mp4" />
                         </video>
                     </div>
 
                     {/* NAVBAR */}
-                    <nav className="fixed top-0 z-[100] w-full flex items-center justify-between px-6 lg:px-[120px] py-[24px] bg-black/60 backdrop-blur-2xl border-b border-white/5">
+                    <nav className="fixed top-0 z-[100] w-full flex items-center justify-between px-6 lg:px-[120px] py-[20px] bg-black/40 backdrop-blur-xl border-b border-white/10">
                         <div className="flex items-center cursor-pointer" onClick={() => scrollToSection('home')}>
-                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M1.04356 6.35771L13.6437 0.666504V12.0489L1.04356 6.35771Z" fill="white"/><path d="M18.3563 0.666504L30.9564 6.35771L18.3563 12.0489V0.666504Z" fill="white"/><path d="M1.04356 25.6423L13.6437 31.3335V19.9511L1.04356 25.6423Z" fill="white"/><path d="M18.3563 31.3335L30.9564 25.6423L18.3563 19.9511V31.3335Z" fill="white"/></svg>
+                            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" className="drop-shadow-[0_0_10px_#fff]"><path d="M1.04356 6.35771L13.6437 0.666504V12.0489L1.04356 6.35771Z" fill="white"/><path d="M18.3563 0.666504L30.9564 6.35771L18.3563 12.0489V0.666504Z" fill="white"/><path d="M1.04356 25.6423L13.6437 31.3335V19.9511L1.04356 25.6423Z" fill="white"/><path d="M18.3563 31.3335L30.9564 25.6423L18.3563 19.9511V31.3335Z" fill="white"/></svg>
                         </div>
-                        <div className="hidden lg:flex items-center gap-12 font-manrope font-medium text-sm">
+                        <div className="hidden lg:flex items-center gap-10 font-manrope font-bold text-[13px] tracking-widest uppercase">
                             {["Home", "Services", "Reviews", "Contact Us"].map((link) => (
-                                <button key={link} onClick={() => scrollToSection(link.toLowerCase().replace(' ', ''))} className="hover:text-primary transition-colors">{link}</button>
+                                <button key={link} onClick={() => scrollToSection(link.toLowerCase().replace(' ', ''))} className="hover:text-primary hover:drop-shadow-[0_0_8px_#7b39fc] transition-all">{link}</button>
                             ))}
                         </div>
                         <div className="flex items-center gap-4">
-                            <button onClick={() => scrollToSection('contactus')} className="hidden md:block bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-[8px] font-manrope font-semibold text-sm transition-all border border-white/10">Sign In</button>
-                            <button onClick={() => scrollToSection('contactus')} className="bg-primary hover:brightness-110 px-6 py-2.5 rounded-[8px] font-manrope font-semibold text-sm shadow-[0_0_20px_rgba(123,57,252,0.4)] transition-all">Get Started</button>
+                            <button onClick={() => scrollToSection('contactus')} className="bg-primary hover:scale-105 px-7 py-2.5 rounded-[6px] font-manrope font-bold text-xs tracking-widest uppercase shadow-[0_0_20px_rgba(123,57,252,0.6)] transition-all">Get Started</button>
                         </div>
                     </nav>
 
@@ -150,84 +153,67 @@
                         
                         {/* HERO */}
                         <section id="home" className="min-h-screen flex flex-col items-center justify-center text-center px-6">
-                            <div className="bg-primary/20 backdrop-blur-xl px-5 py-2 rounded-full mb-10 border border-primary/40">
-                                <span className="font-cabin text-sm font-bold tracking-widest text-primary-300">DATACORE V3.2 NOW LIVE</span>
+                            <div className="bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full mb-8 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                                <span className="font-manrope text-[10px] font-bold tracking-[0.3em] text-white">DATACORE // V3.2</span>
                             </div>
-                            <h1 className="font-extended text-[60px] md:text-[120px] leading-[0.95] max-w-[1200px] mb-10 tracking-tight">
-                                Book your perfect stay <br/> <span className="italic">instantly</span> & hassle-free
+                            <h1 className="font-instrument text-[55px] md:text-[105px] leading-[1.05] max-w-[1100px] mb-8 glow-text">
+                                Book your perfect stay instantly <br/> <span className="italic">and</span> hassle-free
                             </h1>
-                            <p className="text-white/90 font-inter text-xl md:text-2xl max-w-[800px] mb-14 leading-relaxed">Luxury stays curated for the modern traveler. Experience seamless booking with 24/7 global support.</p>
-                            <button onClick={() => scrollToSection('contactus')} className="bg-primary px-12 py-6 rounded-2xl font-cabin text-xl font-bold hover:scale-105 transition-transform shadow-2xl">Start Your Journey</button>
+                            <p className="text-white/70 font-inter text-lg md:text-xl max-w-[600px] mb-12">Handpicked luxury for the modern digital nomad. Faster, smarter, and more secure booking.</p>
+                            <button onClick={() => scrollToSection('contactus')} className="bg-white text-black px-12 py-5 rounded-full font-manrope font-bold text-sm tracking-widest uppercase hover:bg-primary hover:text-white hover:shadow-[0_0_30px_#7b39fc] transition-all">Start Booking</button>
                         </section>
 
                         {/* SERVICES */}
-                        <section id="services" className="section-spacer px-6 lg:px-[120px]">
-                            <h2 className="font-extended text-7xl md:text-9xl mb-32 text-center">Services</h2>
-                            <div className="grid lg:grid-cols-3 gap-12 max-w-7xl mx-auto">
+                        <section id="services" className="py-32 px-6 lg:px-[120px]">
+                            <h2 className="font-instrument text-6xl md:text-8xl mb-24 text-center glow-text">Our Services</h2>
+                            <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                                 {[
-                                    { t: "Smart Concierge", d: "AI-driven local guides available 24/7 for every guest request.", img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" },
-                                    { t: "Private Resorts", d: "Access to islands and estates not listed on any public platforms.", img: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=800&q=80" },
-                                    { t: "Elite Transport", d: "Integrated flight and ground transport handled by our experts.", img: "https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?auto=format&fit=crop&w=800&q=80" }
+                                    { t: "Concierge 24/7", d: "Global support for every whim, handled by professionals.", img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" },
+                                    { t: "Exclusive Access", d: "Off-market properties you won't find anywhere else.", img: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=800&q=80" },
+                                    { t: "Fast Booking", d: "Proprietary stack ensuring 1-click checkout for elites.", img: "https://images.unsplash.com/photo-1436491865332-7a61a109c0f3?auto=format&fit=crop&w=800&q=80" }
                                 ].map((s, i) => (
-                                    <div key={i} className="glass-card-solid rounded-[40px] overflow-hidden group border-white/10 hover:border-primary/50 transition-colors">
-                                        <div className="h-72 overflow-hidden">
-                                            <img src={s.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-70 group-hover:opacity-100" />
+                                    <div key={i} className="shiny-card rounded-2xl overflow-hidden group hover:border-primary transition-all duration-500">
+                                        <div className="h-56 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
+                                            <img src={s.img} className="w-full h-full object-cover opacity-60 group-hover:opacity-100" />
                                         </div>
-                                        <div className="p-12">
-                                            <h3 className="font-extended text-4xl mb-6 italic text-primary">{s.t}</h3>
-                                            <p className="text-white/80 font-inter leading-relaxed text-xl">{s.d}</p>
+                                        <div className="p-8">
+                                            <h3 className="font-instrument text-3xl mb-4 italic text-white group-hover:text-primary transition-colors">{s.t}</h3>
+                                            <p className="text-white/60 font-inter leading-relaxed">{s.d}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </section>
 
-                        {/* REVIEWS */}
-                        <section id="reviews" className="section-spacer px-6 lg:px-[120px] bg-black/60 backdrop-blur-xl">
-                            <h2 className="font-extended text-7xl md:text-9xl mb-32 text-center italic">Reviews</h2>
-                            <div className="grid md:grid-cols-2 gap-16 max-w-6xl mx-auto">
-                                <div className="glass-card-solid p-16 rounded-[50px] border-t-2 border-primary/40 relative">
-                                    <div className="text-primary text-6xl font-extended absolute -top-8 left-12">“</div>
-                                    <p className="text-2xl font-extended italic mb-10 leading-snug">"The most refined booking experience I've had. From Bali to Paris, Datacore handles everything with absolute perfection."</p>
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-1 px-4 bg-primary"></div>
-                                        <span className="font-manrope font-bold tracking-widest text-sm">OLIVER VANDERGRIFT</span>
-                                    </div>
+                        {/* REVIEWS (NO BG) */}
+                        <section id="reviews" className="py-32 px-6 lg:px-[120px]">
+                            <h2 className="font-instrument text-6xl md:text-8xl mb-24 text-center italic glow-text">Reviews</h2>
+                            <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+                                <div className="border-l-2 border-primary pl-10 py-4">
+                                    <p className="text-2xl font-instrument italic mb-6 leading-relaxed">"The interface feels like the future. Booking a villa in the Swiss Alps was as simple as sending a text."</p>
+                                    <span className="font-manrope font-bold tracking-widest text-xs text-primary uppercase">Julian Thorne</span>
                                 </div>
-                                <div className="glass-card-solid p-16 rounded-[50px] border-t-2 border-primary/40 relative">
-                                    <div className="text-primary text-6xl font-extended absolute -top-8 left-12">“</div>
-                                    <p className="text-2xl font-extended italic mb-10 leading-snug">"Finally, a service that understands true luxury is about saving time. The interface is as beautiful as the properties."</p>
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-1 px-4 bg-primary"></div>
-                                        <span className="font-manrope font-bold tracking-widest text-sm">SOPHIA CHENG</span>
-                                    </div>
+                                <div className="border-l-2 border-white/20 pl-10 py-4">
+                                    <p className="text-2xl font-instrument italic mb-6 leading-relaxed">"Absolute transparency and elite selection. Datacore is the only platform I trust for my quarterly retreats."</p>
+                                    <span className="font-manrope font-bold tracking-widest text-xs text-white/40 uppercase">Elena Rossi</span>
                                 </div>
                             </div>
                         </section>
 
-                        {/* CONTACT US (THE GLOWING RECTANGLE) */}
-                        <section id="contactus" className="section-spacer px-6 lg:px-[120px]">
-                            <div className="max-w-4xl mx-auto glowing-container">
-                                <div className="glowing-inner p-12 md:p-24">
-                                    <h2 className="font-extended text-6xl md:text-8xl mb-8 text-center italic tracking-tight">Inquire</h2>
-                                    <p className="text-center text-white/70 mb-16 font-inter text-xl max-w-xl mx-auto">Ready for your next escape? Submit your details for a personalized consultation.</p>
+                        {/* CONTACT US (Sized to fit screen) */}
+                        <section id="contactus" className="px-6 lg:px-[120px] pb-32">
+                            <div className="max-w-4xl w-full mx-auto glowing-container">
+                                <div className="glowing-inner p-8 md:p-12">
+                                    <div className="text-center mb-10">
+                                        <h2 className="font-instrument text-5xl md:text-6xl mb-4 glow-text italic">Inquire</h2>
+                                        <p className="text-white/50 font-inter">Premium support for premium members.</p>
+                                    </div>
                                     
-                                    <form className="space-y-8" onSubmit={e => e.preventDefault()}>
-                                        <div className="grid md:grid-cols-2 gap-8">
-                                            <div className="flex flex-col gap-2">
-                                                <label className="font-manrope text-xs font-bold text-white/40 ml-2">FULL NAME</label>
-                                                <input type="text" placeholder="John Doe" className="bg-white/5 border border-white/10 p-5 rounded-2xl focus:border-primary outline-none transition-all font-inter text-lg" />
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <label className="font-manrope text-xs font-bold text-white/40 ml-2">EMAIL ADDRESS</label>
-                                                <input type="email" placeholder="john@example.com" className="bg-white/5 border border-white/10 p-5 rounded-2xl focus:border-primary outline-none transition-all font-inter text-lg" />
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col gap-2">
-                                            <label className="font-manrope text-xs font-bold text-white/40 ml-2">YOUR MESSAGE</label>
-                                            <textarea placeholder="Describe your dream stay..." className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl h-48 focus:border-primary outline-none transition-all font-inter text-lg"></textarea>
-                                        </div>
-                                        <button className="w-full bg-primary py-6 rounded-2xl font-manrope font-bold text-xl hover:shadow-[0_0_30px_rgba(123,57,252,0.6)] transition-all uppercase tracking-widest">Submit Inquiry</button>
+                                    <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={e => e.preventDefault()}>
+                                        <input type="text" placeholder="Name" className="bg-white/5 border border-white/10 p-4 rounded-lg focus:border-primary outline-none transition-all font-inter" />
+                                        <input type="email" placeholder="Email" className="bg-white/5 border border-white/10 p-4 rounded-lg focus:border-primary outline-none transition-all font-inter" />
+                                        <textarea placeholder="Your Message" className="md:col-span-2 bg-white/5 border border-white/10 p-4 rounded-lg h-32 focus:border-primary outline-none transition-all font-inter"></textarea>
+                                        <button className="md:col-span-2 bg-primary py-4 rounded-lg font-manrope font-bold text-sm tracking-[0.2em] uppercase hover:shadow-[0_0_40px_rgba(123,57,252,0.8)] transition-all">Submit Request</button>
                                     </form>
                                 </div>
                             </div>
@@ -235,19 +221,19 @@
                     </main>
 
                     {/* FOOTER */}
-                    <footer className="relative z-10 footer-glow bg-[#050505] border-t border-white/10 py-24 px-6 lg:px-[120px]">
-                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
-                            <div className="flex items-center gap-6">
-                                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center font-bold text-xl">D</div>
-                                <span className="font-extended text-3xl tracking-[0.2em] italic">DATACORE</span>
+                    <footer className="relative z-10 footer-glow bg-black border-t border-white/10 py-20 px-6 lg:px-[120px]">
+                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+                            <div className="flex items-center gap-4">
+                                <div className="w-8 h-8 bg-white text-black flex items-center justify-center font-bold">D</div>
+                                <span className="font-manrope font-bold tracking-[.4em] text-sm">DATACORE</span>
                             </div>
-                            <div className="flex gap-12 text-white/50 text-sm font-manrope font-semibold">
-                                <a href="#" className="hover:text-primary transition-colors uppercase tracking-widest">Privacy Policy</a>
-                                <a href="#" className="hover:text-primary transition-colors uppercase tracking-widest">Terms of Use</a>
-                                <a href="#" className="hover:text-primary transition-colors uppercase tracking-widest">Cookie Policy</a>
+                            <div className="flex gap-10 text-white/30 text-[10px] font-manrope font-bold tracking-widest uppercase">
+                                <a href="#" className="hover:text-primary transition-colors">Privacy</a>
+                                <a href="#" className="hover:text-primary transition-colors">Terms</a>
+                                <a href="#" className="hover:text-primary transition-colors">Legal</a>
                             </div>
-                            <div className="text-white/20 text-xs font-inter uppercase tracking-widest">
-                                © 2026 Datacore Technologies. Luxury without compromise.
+                            <div className="text-white/20 text-[9px] font-inter uppercase tracking-[.3em]">
+                                © 2026 Datacore. Designed for the Elite.
                             </div>
                         </div>
                     </footer>
@@ -255,8 +241,8 @@
             );
         };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<LandingPage />);
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(<LandingPage />);
     </script>
 </body>
 </html>
